@@ -171,6 +171,12 @@ def cut_frame(sheet, name, spec):
     if "anchorY" in spec:
         anchor_y = spec["anchorY"] - rect[1] - by0
 
+    fade = spec.get("fadeX", 0)
+    if fade:
+        # Soft horizontal edges for crops that cut through a wide illustration.
+        ramp = np.clip(np.minimum(np.arange(w), np.arange(w)[::-1]) / fade, 0, 1)
+        rgba[..., 3] = (rgba[..., 3] * ramp[None, :]).astype(np.uint8)
+
     if spec.get("flipX"):
         rgba = rgba[:, ::-1]
         anchor_x = w - anchor_x
