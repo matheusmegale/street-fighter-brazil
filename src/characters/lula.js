@@ -17,7 +17,7 @@ export default {
   scale: 2,
   frameScale: { hit: 1.12 },
 
-  stats: { health: 1040, walkSpeed: 4.2, backSpeed: 3.4, jumpVelocity: 20.5, jumpForward: 5, gravity: 1 },
+  stats: { health: 1040, walkSpeed: 4.5, backSpeed: 3.6, jumpVelocity: 20.5, jumpForward: 5, gravity: 1 },
   body: { width: 88, standHeight: 280, crouchHeight: 196 },
   hurtboxes: {
     stand: [box(-46, 0, 92, 290)],
@@ -32,7 +32,7 @@ export default {
       frames: { startup: ['punch_1'], active: ['punch_3'], recovery: ['punch_1'] },
     },
     hp: {
-      startup: 8, active: 3, recovery: 15, damage: 95, hitstun: 20, blockstun: 15, knockback: 5,
+      startup: 7, active: 3, recovery: 14, damage: 95, hitstun: 20, blockstun: 15, knockback: 5,
       hitbox: box(60, 165, 100, 48), level: 'mid', meterGain: 10, hitstop: 11, sfx: 'heavy',
       frames: { startup: ['punch_2'], active: ['punch_4'], recovery: ['punch_2', 'punch_0'] },
     },
@@ -42,7 +42,7 @@ export default {
       frames: { startup: ['kick_0'], active: ['kick_1'], recovery: ['kick_0'] },
     },
     hk: {
-      startup: 10, active: 4, recovery: 17, damage: 105, hitstun: 22, blockstun: 16, knockback: 6,
+      startup: 9, active: 4, recovery: 16, damage: 105, hitstun: 22, blockstun: 16, knockback: 6,
       hitbox: box(64, 140, 112, 64), level: 'mid', meterGain: 11, hitstop: 12, sfx: 'heavy',
       frames: { startup: ['kick_0', 'kick_2'], active: ['kick_3'], recovery: ['kick_2', 'kick_0'] },
     },
@@ -80,23 +80,23 @@ export default {
 
   specials: {
     neutral: {
-      name: 'Discurso do Povo', startup: 12, active: 4, recovery: 24, meterGain: 8, sfx: 'speech',
+      name: 'Discurso do Povo', startup: 11, active: 4, recovery: 22, meterGain: 8, sfx: 'speech',
       frames: { startup: ['sp1_1'], active: ['sp1_0'], recovery: ['sp1_1'] },
       projectile: {
-        visual: 'star', offsetX: 150, offsetY: 180, w: 64, h: 64, speed: 9, life: 200,
+        visual: 'star', offsetX: 150, offsetY: 180, w: 64, h: 64, speed: 10, life: 200,
         damage: 82, chip: 0.25, hitstun: 19, blockstun: 15, knockback: 4, hitstop: 9, sfx: 'special',
       },
     },
     forward: {
-      name: 'Chute do Povo', startup: 9, active: 6, recovery: 20, damage: 115, chip: 0.25,
+      name: 'Chute do Povo', startup: 9, active: 6, recovery: 22, damage: 115, chip: 0.25,
       hitstun: 22, blockstun: 16, knockback: 6, knockdown: true, level: 'mid',
       hitbox: box(60, 80, 180, 90), motion: { vx: 9, from: 5, to: 14 },
       meterGain: 10, hitstop: 13, sfx: 'heavy',
       frames: { startup: ['kick_0'], active: ['sp3_0'], recovery: ['sp3_1'] },
     },
     down: {
-      name: 'Paz e Diálogo', startup: 12, active: 10, recovery: 26, damage: 100, chip: 0.25,
-      hitstun: 24, blockstun: 16, knockback: 8, level: 'mid', invulnerable: true,
+      name: 'Paz e Diálogo', startup: 12, active: 10, recovery: 25, damage: 100, chip: 0.25,
+      hitstun: 24, blockstun: 16, knockback: 8, knockdown: true, level: 'mid', invulnerable: true,
       hitbox: box(-210, 0, 420, 320), meterGain: 10, hitstop: 12, sfx: 'crowd', effect: 'crowdBurst',
       frames: { startup: ['jump_1'], active: ['sp2_0'], recovery: ['sp2_0', 'idle_0'] },
     },
@@ -107,8 +107,8 @@ export default {
     invulnerable: true, sfx: 'super',
     frames: { startup: ['jump_1'], active: ['sp2_0'], recovery: ['sp2_0', 'idle_0'] },
     projectile: {
-      visual: 'wave', offsetX: 130, offsetY: 160, w: 170, h: 320, speed: 8, life: 150,
-      hits: 4, hitInterval: 6, damage: 80, chip: 0.25, hitstun: 22, blockstun: 14, knockback: 2,
+      visual: 'wave', offsetX: 190, offsetY: 160, w: 170, h: 320, speed: 8, life: 150,
+      hits: 4, hitInterval: 6, damage: 95, chip: 0.25, hitstun: 22, blockstun: 14, knockback: 2,
       knockdown: true, priority: 2, hitstop: 10, sfx: 'superHit',
     },
   },

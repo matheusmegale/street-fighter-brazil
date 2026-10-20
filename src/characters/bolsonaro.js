@@ -92,9 +92,9 @@ export default {
       },
     },
     forward: {
-      name: 'Motociata', startup: 8, active: 22, recovery: 14, damage: 110, chip: 0.25,
+      name: 'Motociata', startup: 8, active: 20, recovery: 20, damage: 105, chip: 0.25,
       hitstun: 22, blockstun: 16, knockback: 7, knockdown: true, level: 'mid',
-      hitbox: box(20, 20, 140, 180), motion: { vx: 11, from: 6, to: 30 },
+      hitbox: box(20, 20, 140, 180), motion: { vx: 10, from: 6, to: 26 },
       meterGain: 10, hitstop: 12, sfx: 'engine', effect: 'dust',
       frames: { startup: ['sp2_0'], active: ['sp2_1', 'sp2_2', 'sp2_3'], recovery: ['sp2_3'] },
       loopActive: true,
@@ -114,7 +114,7 @@ export default {
     frames: { startup: ['jump_1'], active: ['punch_4'], recovery: ['punch_4', 'punch_2'] },
     projectile: {
       visual: 'sprite', sprite: 'superfx', spriteScale: 1.3, offsetX: 150, offsetY: 150, w: 210, h: 150,
-      speed: 14, life: 120, damage: 330, chip: 0.25, hitstun: 30, blockstun: 22, knockback: 6,
+      speed: 14, life: 120, damage: 320, chip: 0.25, hitstun: 30, blockstun: 22, knockback: 6,
       knockdown: true, priority: 2, hitstop: 18, sfx: 'superHit',
     },
   },

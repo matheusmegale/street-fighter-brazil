@@ -233,11 +233,11 @@ export class FighterAI {
     }
 
     if (dist > CLOSE) {
-      if (specials.forward && r < cfg.specialChance) {
+      if (specials.forward && r < cfg.specialChance * 0.5) {
         this.plan = { kind: 'press', buttons: ['special'], dir: 1, ticks: 1 };
-      } else if (specials.neutral && r < cfg.specialChance + cfg.zoning * 0.4) {
+      } else if (specials.neutral && r < cfg.specialChance * 0.5 + cfg.zoning * 0.4) {
         this.plan = { kind: 'press', buttons: ['special'], dir: 0, ticks: 1 };
-      } else if (r < cfg.specialChance + cfg.zoning * 0.4 + cfg.jumpChance) {
+      } else if (r < cfg.specialChance * 0.5 + cfg.zoning * 0.4 + cfg.jumpChance) {
         this.plan = { kind: 'jump', dir: 1, ticks: 1, airAttack: this.rng() < 0.5 ? 'hk' : 'hp' };
       } else if (r < 0.35 + cfg.aggression * 0.6) {
         this.plan = { kind: 'walk', dir: 1, ticks: this.thinkTimer };
