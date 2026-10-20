@@ -122,14 +122,17 @@ def isolate_subject(rgb, rect, spec):
     """Keeps the connected blobs that belong to this frame, dropping neighbours and labels."""
     fg = ~background_mask(rgb)
     x0, y0 = rect[0], rect[1]
+    h, w = fg.shape
     for ex in spec.get("exclude", []):
-        fg[max(ex[1] - y0, 0):ex[3] - y0 + 1, max(ex[0] - x0, 0):ex[2] - x0 + 1] = False
+        top, bottom = max(ex[1] - y0, 0), min(ex[3] - y0 + 1, h)
+        left, right = max(ex[0] - x0, 0), min(ex[2] - x0 + 1, w)
+        if top < bottom and left < right:
+            fg[top:bottom, left:right] = False
     labels, comps = label_components(fg)
     comps = [c for c in comps if c["area"] >= spec.get("minArea", MIN_COMPONENT)]
     if not comps:
         raise ValueError(f"no subject found in {rect}")
     largest = max(c["area"] for c in comps)
-    w = fg.shape[1]
     alpha = np.zeros_like(fg)
     for c in comps:
         touches_side = c["box"][0] == 0 or c["box"][2] == w - 1
@@ -190,6 +193,8 @@ def pack(images):
     placed = {}
     for name in order:
         w, h = images[name].size
+        if w > ATLAS_WIDTH:
+            raise ValueError(f"{name} is {w}px wide, wider than the {ATLAS_WIDTH}px atlas")
         if x + w + PADDING > ATLAS_WIDTH:
             x = 0
             y += shelf_h + PADDING

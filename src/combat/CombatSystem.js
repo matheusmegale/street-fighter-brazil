@@ -83,6 +83,7 @@ function resolveClashes(sim) {
 
 function applyHit(sim, hit) {
   const { attacker, defender, move, projectile } = hit;
+  if (defender.isInvulnerable()) return;
   if (projectile) {
     if (projectile.dead) return;
     projectile.spendHit();

@@ -4,8 +4,8 @@ import { makeCharacter, press, NONE } from './helpers.js';
 
 const fragile = () => makeCharacter({ stats: { health: 40 } });
 
-function makeMatch(p1 = makeCharacter(), p2 = makeCharacter()) {
-  return new Match({ characters: [p1, p2], startPositions: [800, 880], stageWidth: 1920 });
+function makeMatch(p1 = makeCharacter(), p2 = makeCharacter(), startPositions = [800, 880]) {
+  return new Match({ characters: [p1, p2], startPositions, stageWidth: 1920 });
 }
 
 function toFight(match, input1 = NONE) {
@@ -83,6 +83,23 @@ describe('round flow', () => {
     const ticks = fightUntilRoundEnds(match, (t) => (t === 99 * 60 - 3 ? press('lp') : NONE));
     expect(ticks).toBe(99 * 60);
     expect(match.lastResult).toMatchObject({ winner: 0, reason: 'ko' });
+  });
+
+  it('nothing can hurt the fighters once the round has been decided', () => {
+    const match = makeMatch(makeCharacter(), makeCharacter(), [300, 1000]);
+    toFight(match);
+    // P2 fires just before the clock runs out; the projectile is still flying at time over
+    fightUntilRoundEnds(match, () => NONE, (t) => (t === 99 * 60 - 20 ? press('special') : NONE));
+    expect(match.lastResult).toMatchObject({ reason: 'timeover' });
+    const health = match.sim.fighters.map((f) => f.health);
+    const hitsAfter = [];
+    while (match.phase === 'roundOver') {
+      match.step(NONE, NONE);
+      hitsAfter.push(...match.events.filter((e) => e.type === 'hit'));
+    }
+    expect(hitsAfter).toHaveLength(0);
+    expect(match.wins).toEqual([1, 1]);
+    expect(health).toEqual([1000, 1000]);
   });
 
   it('the next round restores health and starting positions', () => {

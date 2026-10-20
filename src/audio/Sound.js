@@ -196,6 +196,7 @@ class Sound {
     let next = this.ctx.currentTime + 0.1;
     this.timer = setInterval(() => {
       if (!this.ctx) return;
+      if (next < this.ctx.currentTime) next = this.ctx.currentTime + 0.05;
       while (next < this.ctx.currentTime + 0.25) {
         const lead = track.lead[step % track.lead.length];
         const bass = track.bass[Math.floor(step / 2) % track.bass.length];

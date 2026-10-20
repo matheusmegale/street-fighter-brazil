@@ -112,7 +112,10 @@ export class Hud {
       const full = f.meter >= METER_MAX;
       side.meter.setSize((METER_W * f.meter) / METER_MAX, 14);
       side.meter.fillColor = full ? (Math.floor(now / 120) % 2 ? 0xffd400 : 0xffffff) : 0x37a3ff;
-      side.meterLabel.setText(full ? 'SUPER!' : 'ENERGIA').setColor(full ? '#ffd400' : '#9fd3ff');
+      if (side.meterFull !== full) {
+        side.meterFull = full;
+        side.meterLabel.setText(full ? 'SUPER!' : 'ENERGIA').setColor(full ? '#ffd400' : '#9fd3ff');
+      }
 
       const faces = this.defs[i].faces;
       let face = faces.normal;

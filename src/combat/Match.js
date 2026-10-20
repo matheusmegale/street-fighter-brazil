@@ -95,6 +95,8 @@ export class Match {
 
   endRound(winner, reason) {
     this.lastResult = { winner, reason };
+    this.sim.combatEnabled = false;
+    this.sim.clearProjectiles();
     if (winner === null) {
       this.wins[0]++;
       this.wins[1]++;

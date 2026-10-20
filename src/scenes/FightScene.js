@@ -86,6 +86,7 @@ export class FightScene extends Phaser.Scene {
     } else {
       this.tweens.resumeAll();
       this.accumulator = 0;
+      input.resetMenu();
     }
   }
 
@@ -107,6 +108,7 @@ export class FightScene extends Phaser.Scene {
   }
 
   update(time, delta) {
+    if (input.pausePressed()) this.togglePause();
     if (this.paused) {
       this.updatePause();
       return;
@@ -150,10 +152,12 @@ export class FightScene extends Phaser.Scene {
         sound.play('fight');
         break;
       case 'attackStart': {
-        const f = this.match.fighters[e.fighter];
+        // The fighter may already have been hit this tick, so read the move from its config.
+        const def = this.defs[e.fighter];
         if (e.kind === 'special') {
-          sound.play(f.move.sfx || 'special');
-          if (f.move.effect === 'crowdBurst') effects.ring(f.x, 120, f.def.colors.primary, 9);
+          const move = def.specials[e.move];
+          sound.play(move.sfx || 'special');
+          if (move.effect === 'crowdBurst') effects.ring(this.match.fighters[e.fighter].x, 120, def.colors.primary, 9);
         } else if (e.kind === 'normal') {
           sound.play('whoosh');
         }
@@ -273,7 +277,7 @@ export class FightScene extends Phaser.Scene {
     const w = {};
     for (const f of this.match.fighters) {
       for (const hb of f.hurtboxes()) draw(toWorld(hb, f.x, f.y, f.facing, w), 0x37a3ff);
-      draw(toWorld({ x: -f.halfWidth, y: 0, w: f.halfWidth * 2, h: f.pushHeight }, f.x, f.y, f.facing, w), 0xffffff);
+      draw(toWorld({ x: -f.halfWidth, y: 0, w: f.halfWidth * 2, h: 12 }, f.x, f.y, f.facing, w), 0xffffff);
       if (f.state === 'attack' && f.move.hitbox && f.phase === 'active') draw(toWorld(f.move.hitbox, f.x, f.y, f.facing, w), 0xff3030);
     }
     for (const p of this.match.sim.projectiles) draw(p.box(w), 0xff9a1f);

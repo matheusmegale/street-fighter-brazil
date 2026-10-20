@@ -102,9 +102,4 @@ export class FighterSprite {
       if (this.tint) this.sprite.setTint(this.tint);
     }
   }
-
-  destroy() {
-    this.sprite.destroy();
-    this.shadow.destroy();
-  }
 }

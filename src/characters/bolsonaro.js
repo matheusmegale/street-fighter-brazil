@@ -22,7 +22,7 @@ export default {
   frameScale: { punch: 1.07, kick: 1.07, crouchatk: 1.05, sp1: 1.07, sp3: 1.07, hit: 1.1, ko: 1.05 },
 
   stats: { health: 1000, walkSpeed: 4.6, backSpeed: 3.6, jumpVelocity: 21, jumpForward: 5.2, gravity: 1 },
-  body: { width: 84, standHeight: 280, crouchHeight: 196 },
+  body: { width: 84 },
   hurtboxes: {
     stand: [box(-44, 0, 88, 292)],
     crouch: [box(-48, 0, 96, 200)],
@@ -84,7 +84,7 @@ export default {
 
   specials: {
     neutral: {
-      name: 'Tiro Certeiro', startup: 10, active: 4, recovery: 22, meterGain: 8, sfx: 'shot',
+      name: 'Tiro Certeiro', startup: 10, active: 4, recovery: 22, sfx: 'shot',
       frames: { startup: ['sp1_1'], active: ['sp1_0'], recovery: ['sp1_1'] },
       projectile: {
         visual: 'shot', offsetX: 170, offsetY: 172, w: 76, h: 34, speed: 13, life: 160,
@@ -135,9 +135,6 @@ export default {
     ko: { frames: ['ko_0', 'ko_1'], fps: 6 },
     victory: { frames: ['jump_1'], fps: 1 },
   },
-  faces: {
-    normal: 'face_normal', hurt: 'face_dor', angry: 'face_raiva', ko: 'face_surpreso',
-    win: 'face_sorriso', select: 'face_bravo', talk: 'face_falando', smug: 'face_ironico',
-  },
+  faces: { normal: 'face_normal', hurt: 'face_dor', angry: 'face_raiva', ko: 'face_surpreso', win: 'face_sorriso' },
   winQuote: 'Ninguém segura quem tem a faixa!',
 };

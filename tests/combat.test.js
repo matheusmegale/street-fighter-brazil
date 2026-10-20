@@ -149,6 +149,59 @@ describe('blocking', () => {
   });
 });
 
+describe('air attacks into specials', () => {
+  it('a special pressed after a jump-in hit comes out on landing instead of being lost', () => {
+    const sim = makeSim({ startPositions: [800, 1000] });
+    let lastY = 0;
+    let kicked = false;
+    let specialPressed = false;
+    let groundedSpecialStart = false;
+    for (let t = 1; t <= 90; t++) {
+      const f = sim.fighters[0];
+      const descending = f.y < lastY;
+      lastY = f.y;
+      let input = NONE;
+      if (t === 1) input = press('up right');
+      else if (!kicked && descending && f.y < 170) {
+        kicked = true;
+        input = press('lk');
+      } else if (kicked && !specialPressed && descending && f.y < 40) {
+        specialPressed = true;
+        input = press('special');
+      }
+      sim.step(input, NONE);
+      const start = sim.events.find((e) => e.type === 'attackStart' && e.fighter === 0 && e.kind === 'special');
+      if (start && sim.fighters[0].y === 0) groundedSpecialStart = true;
+    }
+    expect(sim.fighters[1].health).toBeLessThan(1000);
+    expect(specialPressed).toBe(true);
+    expect(groundedSpecialStart).toBe(true);
+  });
+});
+
+describe('simultaneous hits', () => {
+  it('a defender knocked out by one hit is not hit again by a second hit in the same tick', () => {
+    const slowShot = makeCharacter({ specials: { neutral: { projectile: { speed: 2, life: 400 } } } });
+    const fragile = makeCharacter({ stats: { health: 40 } });
+    // walk in behind the slow projectile until in jab range, then hold still
+    const approach = (t) => (t > 30 && t <= 77 ? press('right') : NONE);
+
+    const probe = makeSim({ p1: slowShot, p2: fragile, startPositions: [600, 900] });
+    const projectileHitAt = stepUntil(probe, (s) => s.events.some((e) => e.type === 'hit'), 400,
+      (t) => (t === 1 ? press('special') : approach(t)));
+
+    const sim = makeSim({ p1: slowShot, p2: fragile, startPositions: [600, 900] });
+    const events = run(sim, projectileHitAt + 20, (t) => {
+      if (t === 1) return press('special');
+      if (t === projectileHitAt - 3) return press('lp');
+      return approach(t);
+    });
+    const sameTickHits = events.filter((e) => e.type === 'hit');
+    expect(sameTickHits.length).toBe(1);
+    expect(events.filter((e) => e.type === 'ko')).toHaveLength(1);
+  });
+});
+
 describe('hitstun and combos', () => {
   it('a fighter in hitstun cannot attack until the hitstun ends', () => {
     const sim = makeSim();

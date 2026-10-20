@@ -126,17 +126,4 @@ export function createEffectTextures(scene) {
     ctx.arc(32, 32, 28, 0, Math.PI * 2);
     ctx.stroke();
   });
-
-  canvas(scene, 'fx-flash', 64, 64, (ctx) => {
-    const g = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
-    g.addColorStop(0, 'rgba(255,255,255,1)');
-    g.addColorStop(1, 'rgba(255,255,255,0)');
-    ctx.fillStyle = g;
-    ctx.fillRect(0, 0, 64, 64);
-  });
-
-  canvas(scene, 'fx-pixel', 4, 4, (ctx) => {
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, 4, 4);
-  });
 }

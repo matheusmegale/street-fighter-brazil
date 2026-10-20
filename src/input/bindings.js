@@ -17,9 +17,9 @@ export const DEFAULT_BINDINGS = Object.freeze([
 
 const STORAGE_KEY = 'brasil-fighters:bindings';
 
-export function actionsFromCodes(bindings, player, codes) {
+/** `codes` is anything with has(code); `out` may be passed in to avoid allocating. */
+export function actionsFromCodes(bindings, player, codes, out = {}) {
   const map = bindings[player];
-  const out = {};
   for (const action of ACTIONS) out[action] = codes.has(map[action]);
   return out;
 }

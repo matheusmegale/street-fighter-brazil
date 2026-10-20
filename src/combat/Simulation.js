@@ -2,7 +2,6 @@ import { Fighter } from '../entities/Fighter.js';
 import { Projectile } from '../entities/Projectile.js';
 import { resolveCombat } from './CombatSystem.js';
 
-export const SCREEN_WIDTH = 1280;
 export const DEFAULT_STAGE_WIDTH = 1920;
 /** Fighters must stay fully on one camera-width screen. */
 export const DEFAULT_MAX_SEPARATION = 1100;
@@ -24,6 +23,7 @@ export class Simulation {
     this.events = [];
     this.freeze = 0;
     this.frame = 0;
+    this.combatEnabled = true;
     this.resetRound();
   }
 
@@ -31,9 +31,14 @@ export class Simulation {
     const [x1, x2] = this.startPositions;
     this.fighters[0].reset(x1, 1);
     this.fighters[1].reset(x2, -1);
+    this.clearProjectiles();
+    this.freeze = 0;
+    this.combatEnabled = true;
+  }
+
+  clearProjectiles() {
     for (const p of this.projectiles) this.pool.push(p);
     this.projectiles.length = 0;
-    this.freeze = 0;
   }
 
   get isFrozen() {
@@ -93,7 +98,7 @@ export class Simulation {
     this.clampToArena(a);
     this.clampToArena(b);
 
-    resolveCombat(this);
+    if (this.combatEnabled) resolveCombat(this);
 
     for (let i = this.projectiles.length - 1; i >= 0; i--) {
       const p = this.projectiles[i];

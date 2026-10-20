@@ -1,7 +1,7 @@
-import { ACTIONS, loadBindings, saveBindings } from './bindings.js';
+import { ACTIONS, actionsFromCodes, loadBindings, saveBindings } from './bindings.js';
 import { getStorage } from '../config/settings.js';
 
-const NAV_CODES = new Set(['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space', 'Enter', 'Escape', 'Backspace']);
+const NAV_CODES = new Set(['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space', 'Enter', 'Escape', 'Backspace', 'F1']);
 
 // Standard Gamepad API layout.
 const PAD = { a: 0, b: 1, x: 2, y: 3, lb: 4, rb: 5, lt: 6, rt: 7, start: 9, up: 12, down: 13, left: 14, right: 15 };
@@ -14,12 +14,17 @@ const blankMenu = () => ({ up: false, down: false, left: false, right: false, co
  * Tracks physical keys (KeyboardEvent.code) and gamepads, producing one reusable input
  * object per player for the simulation, plus edge-triggered menu navigation.
  */
-class InputManager {
+export class InputManager {
   constructor() {
     this.keys = new Set();
     // Press counters let each reader see taps shorter than one frame.
     this.pressCounts = new Map();
     this.readers = { player0: new Map(), player1: new Map(), menu0: new Map(), menu1: new Map(), menu: new Map() };
+    this.views = {};
+    for (const [name, reader] of Object.entries(this.readers)) {
+      this.views[name] = { has: (code) => this.isDown(code, reader) };
+    }
+    this.startHeld = false;
     this.bindings = loadBindings(getStorage());
     this.players = [blank(), blank()];
     this.menuHeld = [blankMenu(), blankMenu(), blankMenu()];
@@ -34,7 +39,7 @@ class InputManager {
     this.attached = true;
     win.addEventListener('keydown', (e) => {
       this.notifyFirstInput();
-      if (this.capture) {
+      if (this.capture && !e.repeat) {
         e.preventDefault();
         const done = this.capture;
         this.capture = null;
@@ -94,10 +99,8 @@ class InputManager {
   }
 
   /** Current held state for player 0 or 1 (same object every call). */
-  player(index, reader = this.readers[`player${index}`]) {
-    const out = this.players[index];
-    const map = this.bindings[index];
-    for (const a of ACTIONS) out[a] = this.isDown(map[a], reader);
+  player(index, view = this.views[`player${index}`]) {
+    const out = actionsFromCodes(this.bindings, index, view, this.players[index]);
     const pad = this.pad(index);
     if (pad) {
       const btn = (i) => !!pad.buttons[i]?.pressed;
@@ -123,7 +126,7 @@ class InputManager {
    */
   pollMenu() {
     for (let p = 0; p < 2; p++) {
-      const s = { ...this.player(p, this.readers[`menu${p}`]) };
+      const s = { ...this.player(p, this.views[`menu${p}`]) };
       const pad = this.pad(p);
       const padBtn = (i) => !!pad?.buttons[i]?.pressed;
       this.updateMenu(p, {
@@ -150,14 +153,24 @@ class InputManager {
     }
   }
 
-  /** Swallow currently held menu buttons so a scene change doesn't re-trigger them. */
+  /**
+   * Discards pending taps for every reader (menus and players) and swallows held menu
+   * buttons, so a scene change or closing a menu doesn't replay them.
+   */
   resetMenu() {
+    for (const reader of Object.values(this.readers)) {
+      for (const [code, count] of this.pressCounts) reader.set(code, count);
+    }
     this.pollMenu();
     for (const e of this.menuEdges) for (const k in e) e[k] = false;
   }
 
-  keyHeld(code) {
-    return this.keys.has(code);
+  /** True once when any gamepad's Start button goes down. */
+  pausePressed() {
+    const held = [0, 1].some((i) => !!this.pad(i)?.buttons[PAD.start]?.pressed);
+    const edge = held && !this.startHeld;
+    this.startHeld = held;
+    return edge;
   }
 }
 

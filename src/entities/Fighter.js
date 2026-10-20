@@ -75,10 +75,6 @@ export class Fighter {
     return this.def.body.width / 2;
   }
 
-  get pushHeight() {
-    return this.isCrouchingPose() ? this.def.body.crouchHeight : this.def.body.standHeight;
-  }
-
   get actionable() {
     return ACTIONABLE.has(this.state);
   }
@@ -138,7 +134,7 @@ export class Fighter {
       if (!this.tryStartFromBuffer(sim, false)) this.applyMovement();
     } else if (this.state === 'jump' && !this.airAttackUsed) {
       if (this.tryStartFromBuffer(sim, true)) this.airAttackUsed = true;
-    } else if (this.state === 'attack' && this.moveKind === 'normal' && this.moveConnected) {
+    } else if (this.state === 'attack' && this.moveKind === 'normal' && this.moveConnected && !this.moveAir) {
       this.tryCancel(sim);
     }
 
@@ -317,7 +313,7 @@ export class Fighter {
   }
 
   isComboable() {
-    return this.state === 'hitstun' || (this.state === 'knockdown' && this.knockdownPhase === 'falling');
+    return this.state === 'hitstun';
   }
 
   enterBlockstun(frames, slide) {

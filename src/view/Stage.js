@@ -28,7 +28,7 @@ export function createStageTextures(scene) {
   }
 }
 
-/** Adds the layers to a scene; returns the flag image so it can wave. */
+/** Adds the parallax layers (and an optional dimming overlay) to a scene. */
 export function buildStage(scene, { dim = 0 } = {}) {
   const images = LAYERS.map((layer) =>
     scene.add.image(0, 0, layer.key).setOrigin(0, 0).setScale(2).setScrollFactor(layer.scroll).setDepth(-10),

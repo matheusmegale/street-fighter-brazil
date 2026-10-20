@@ -17,13 +17,11 @@ export class Projectile {
     this.hitsLeft = spec.hits || 1;
     this.priority = spec.priority || 1;
     this.cooldown = 0;
-    this.age = 0;
     this.dead = false;
     return this;
   }
 
   update(stageWidth) {
-    this.age++;
     if (this.cooldown > 0) this.cooldown--;
     this.x += this.vx;
     const margin = this.spec.w;

@@ -168,6 +168,7 @@ export class CharacterSelectScene extends Phaser.Scene {
     if (m2.right) this.move(p2, 1);
     if (m2.confirm) this.confirm(p2);
     if (m2.back && p2.confirmed) this.unconfirm(p2);
+    if ((m1.back || m2.back) && !p1.confirmed && !p2.confirmed) this.escapePressed = true;
     if (this.escapePressed) {
       if (p1.confirmed || p2.confirmed) this.players.forEach((pl) => pl.confirmed && this.unconfirm(pl));
       else this.leave();

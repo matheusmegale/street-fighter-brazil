@@ -18,7 +18,7 @@ export default {
   frameScale: { hit: 1.12 },
 
   stats: { health: 1040, walkSpeed: 4.5, backSpeed: 3.6, jumpVelocity: 20.5, jumpForward: 5, gravity: 1 },
-  body: { width: 88, standHeight: 280, crouchHeight: 196 },
+  body: { width: 88 },
   hurtboxes: {
     stand: [box(-46, 0, 92, 290)],
     crouch: [box(-50, 0, 100, 198)],
@@ -80,7 +80,7 @@ export default {
 
   specials: {
     neutral: {
-      name: 'Discurso do Povo', startup: 11, active: 4, recovery: 22, meterGain: 8, sfx: 'speech',
+      name: 'Discurso do Povo', startup: 11, active: 4, recovery: 22, sfx: 'speech',
       frames: { startup: ['sp1_1'], active: ['sp1_0'], recovery: ['sp1_1'] },
       projectile: {
         visual: 'star', offsetX: 150, offsetY: 180, w: 64, h: 64, speed: 10, life: 200,
@@ -129,9 +129,6 @@ export default {
     ko: { frames: ['ko_0', 'ko_1'], fps: 6 },
     victory: { frames: ['jump_1'], fps: 1 },
   },
-  faces: {
-    normal: 'face_normal', hurt: 'face_dor', angry: 'face_bravo', ko: 'face_surpreso',
-    win: 'face_sorriso', select: 'face_determinado', talk: 'face_falando', smug: 'face_ironico',
-  },
+  faces: { normal: 'face_normal', hurt: 'face_dor', angry: 'face_bravo', ko: 'face_surpreso', win: 'face_sorriso' },
   winQuote: 'O povo unido jamais será vencido!',
 };

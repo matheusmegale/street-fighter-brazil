@@ -36,7 +36,7 @@ function mulberry32(seed) {
 
 function makeSnapshot() {
   return {
-    x: 0, y: 0, inAir: false, attacking: false, attackId: 0, level: 'mid', reach: 0,
+    x: 0, inAir: false, attacking: false, attackId: 0, level: 'mid', reach: 0,
     jumpId: 0, projActive: false, projId: 0, projX: 0, projVx: 0,
   };
 }
@@ -88,7 +88,6 @@ export class FighterAI {
     this.lastOppInAir = opp.inAir;
 
     snap.x = opp.x;
-    snap.y = opp.y;
     snap.inAir = opp.inAir;
     snap.attacking = attacking;
     snap.attackId = this.attackCounter;
@@ -120,9 +119,10 @@ export class FighterAI {
     return o;
   }
 
-  hold(o, me, dir) {
+  /** dir: +1 towards the perceived opponent, -1 away from it. */
+  hold(o, dir) {
     if (dir === 0) return;
-    const right = me.facing > 0 ? dir > 0 : dir < 0;
+    const right = this.towardSign > 0 ? dir > 0 : dir < 0;
     o.right = right;
     o.left = !right;
   }
@@ -133,20 +133,25 @@ export class FighterAI {
 
   decide(me, seen, def) {
     const o = this.release();
-    const { cfg } = this;
     const dist = Math.abs(seen.x - me.x);
-    const towardSign = seen.x >= me.x ? 1 : -1;
-    const backDir = me.facing === towardSign ? -1 : 1;
+    this.towardSign = seen.x >= me.x ? 1 : -1;
 
-    // Keep guarding through block/hitstun while the perceived threat lasts.
+    // Keep guarding through block/hitstun while the perceived threat lasts,
+    // matching the height of each new perceived attack.
+    if (this.guard && seen.attacking && this.reacted.attack !== seen.attackId) {
+      this.reacted.attack = seen.attackId;
+      if (this.rng() >= this.cfg.blockChance) this.guard = null;
+    }
     if (this.guard && (seen.attacking || this.guard.ticks > 0)) {
       this.guard.ticks--;
-      this.hold(o, me, backDir);
+      if (seen.attacking) this.guard.low = seen.level === 'low';
+      this.hold(o, -1);
       o.down = this.guard.low;
       if (this.guard.ticks <= 0 && !seen.attacking) this.guard = null;
       return o;
     }
     this.guard = null;
+    if (this.plan?.kind === 'air' && !me.inAir) this.plan = null;
 
     if (me.state !== 'idle' && me.state !== 'walk' && me.state !== 'crouch') {
       if (me.state === 'jump' && this.plan && this.plan.airAttack && me.y < 140 && me.vy < 0) {
@@ -156,25 +161,25 @@ export class FighterAI {
       return o;
     }
 
-    if (this.reactToThreats(o, me, seen, dist, towardSign, backDir)) return o;
+    if (this.reactToThreats(o, me, seen, dist)) return o;
 
     if (--this.thinkTimer <= 0 || !this.plan) this.makePlan(me, seen, dist, def);
-    return this.executePlan(o, me, backDir);
+    return this.executePlan(o);
   }
 
-  reactToThreats(o, me, seen, dist, towardSign, backDir) {
+  reactToThreats(o, me, seen, dist) {
     const { cfg } = this;
     if (seen.attacking && dist < seen.reach + 70 && this.reacted.attack !== seen.attackId) {
       this.reacted.attack = seen.attackId;
       if (this.rng() < cfg.blockChance) {
         this.guard = { ticks: 14, low: seen.level === 'low' };
-        this.hold(o, me, backDir);
+        this.hold(o, -1);
         o.down = this.guard.low;
         return true;
       }
     }
 
-    const incoming = seen.projActive && Math.sign(seen.projVx) === -towardSign;
+    const incoming = seen.projActive && Math.sign(seen.projVx) === -this.towardSign;
     if (incoming && Math.abs(seen.projX - me.x) < PROJECTILE_ALERT && this.reacted.proj !== seen.projId) {
       this.reacted.proj = seen.projId;
       const roll = this.rng();
@@ -183,7 +188,7 @@ export class FighterAI {
         this.thinkTimer = 30;
       } else if (roll < cfg.blockChance) {
         this.guard = { ticks: 30, low: false };
-        this.hold(o, me, backDir);
+        this.hold(o, -1);
         return true;
       }
     }
@@ -196,7 +201,7 @@ export class FighterAI {
         this.thinkTimer = 20;
       } else if (roll < cfg.antiAirChance + cfg.blockChance * 0.5) {
         this.guard = { ticks: 24, low: false };
-        this.hold(o, me, backDir);
+        this.hold(o, -1);
         return true;
       }
     }
@@ -264,26 +269,26 @@ export class FighterAI {
     }
   }
 
-  executePlan(o, me, backDir) {
+  executePlan(o) {
     const plan = this.plan;
     if (!plan) return o;
     switch (plan.kind) {
       case 'walk':
-        this.hold(o, me, plan.dir);
+        this.hold(o, plan.dir);
         break;
       case 'jump':
         o.up = true;
-        this.hold(o, me, plan.dir);
+        this.hold(o, plan.dir);
         this.plan = plan.airAttack ? { kind: 'air', airAttack: plan.airAttack, ticks: 60 } : null;
         return o;
       case 'press':
         for (const b of plan.buttons) o[b] = true;
-        this.hold(o, me, plan.dir);
+        this.hold(o, plan.dir);
         o.down = !!plan.down;
         this.plan = { kind: 'wait', ticks: 4 };
         return o;
       case 'guard':
-        this.hold(o, me, backDir);
+        this.hold(o, -1);
         o.down = plan.low;
         break;
       default:

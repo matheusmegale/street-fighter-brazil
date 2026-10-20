@@ -20,7 +20,7 @@ export function makeCharacter(overrides = {}) {
       jumpForward: 5,
       gravity: 1,
     },
-    body: { width: 80, standHeight: 280, crouchHeight: 190 },
+    body: { width: 80 },
     hurtboxes: {
       stand: [box(-40, 0, 80, 280)],
       crouch: [box(-40, 0, 80, 190)],
@@ -40,7 +40,7 @@ export function makeCharacter(overrides = {}) {
     },
     specials: {
       neutral: {
-        name: 'Fireball', startup: 8, active: 1, recovery: 20, meterGain: 5,
+        name: 'Fireball', startup: 8, active: 1, recovery: 20,
         projectile: { offsetX: 60, offsetY: 160, w: 40, h: 40, speed: 10, life: 200, damage: 80, chip: 0.25, hitstun: 18, blockstun: 14, knockback: 3, hitstop: 0 },
       },
       forward: { name: 'Rush', startup: 6, active: 12, recovery: 14, damage: 100, chip: 0.25, hitstun: 20, blockstun: 14, knockback: 6, hitbox: box(20, 40, 90, 160), level: 'mid', motion: { vx: 10, from: 6, to: 18 }, meterGain: 5, hitstop: 0 },
